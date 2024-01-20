@@ -1,2 +1,3 @@
 .env
 db-data/postgres/*
+db-data/mongo/*

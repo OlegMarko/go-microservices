@@ -26,6 +26,8 @@ type Config struct {
 }
 
 func main() {
+	log.Println("Starting Logger Service")
+
 	mongoClient, err := connectToMongo()
 	if err != nil {
 		log.Panic(err)
@@ -46,7 +48,17 @@ func main() {
 		Models: data.New(client),
 	}
 
-	go app.serve()
+	// go app.serve()
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	err = srv.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
 func (app *Config) serve() {
@@ -73,6 +85,8 @@ func connectToMongo() (*mongo.Client, error) {
 		log.Println("Error connecting: ", err)
 		return nil, err
 	}
+
+	log.Println("Connected to mongo")
 
 	return c, nil
 }
