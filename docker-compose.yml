@@ -21,6 +21,8 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+    depends_on:
+      - rabbitmq
 
   logger-service:
     build:
