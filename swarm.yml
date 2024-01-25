@@ -1,0 +1,101 @@
+version: '3'
+
+services:
+
+  caddy:
+    image: olegmarko7/micro-caddy:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  front-end-service:
+    image: olegmarko7/front-end-service:1.0.1
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      BROKER_URL: http://backend
+
+  broker-service:
+    image: olegmarko7/broker-service:1.0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  listener-service:
+    image: olegmarko7/listener-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  authentication-service:
+    image: olegmarko7/authentication-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+
+  logger-service:
+    image: olegmarko7/logger-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mail-service:
+    image: olegmarko7/mail-service:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: localhost
+      MAIL_HOST: sandbox.smtp.mailtrap.io
+      MAIL_PORT: 2525
+      MAIL_ENCRYPTION: tls
+      MAIL_USERNAME: "c42a4c0c7daf85"
+      MAIL_PASSWORD: "770e0f35c0f9b9"
+      MAIL_FROM_NAME: "Test User"
+      MAIL_FROM_ADDRESS: "test.user@example.com"
+
+  rabbitmq:
+    image: rabbitmq:3.12-alpine
+    deploy:
+      mode: global
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    deploy:
+      mode: global
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_AUTH_SOURCE: admin
+    volumes:
+      - ./db-data/mongo/:/data/db
+
+  postgres:
+    image: postgres:16.1-alpine
+    ports:
+      - "5434:5432"
+    deploy:
+      mode: global
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
