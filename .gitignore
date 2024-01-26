@@ -1,4 +1,4 @@
 .env
-db-data/postgres/*
-db-data/mongo/*
-db-data/rabbitmq/*
+deployment/db-data/postgres/*
+deployment/db-data/mongo/*
+deployment/db-data/rabbitmq/*
