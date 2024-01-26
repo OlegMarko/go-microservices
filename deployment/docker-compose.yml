@@ -13,6 +13,16 @@ services:
       mode: replicated
       replicas: 1
 
+  front-end-service:
+    build:
+      context: ./../front-end
+      dockerfile: front-end-service.dockerfile
+    restart: always
+    ports:
+      - "80:8081"
+    environment:
+      BROKER_URL: http://localhost:8080
+
   listener-service:
     build:
       context: ./../listener-service
