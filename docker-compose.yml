@@ -21,8 +21,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-    depends_on:
-      - rabbitmq
 
   logger-service:
     build:
@@ -63,8 +61,6 @@ services:
       replicas: 1
     environment:
       DSN: "host=postgres user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
-    depends_on:
-      - postgres
 
   postgres:
     image: postgres:16.1-alpine
